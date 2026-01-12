@@ -1,0 +1,231 @@
+{
+    "dashboard": {
+      "title": "ML Inference API - System & Performance Dashboard",
+      "tags": ["ml", "api", "performance"],
+      "timezone": "browser",
+      "panels": [
+        {
+          "id": 1,
+          "title": "API Latency (95th Percentile)",
+          "type": "graph",
+          "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0},
+          "targets": [
+            {
+              "expr": "histogram_quantile(0.95, api_latency_seconds_bucket{endpoint=\"generate\"})",
+              "legendFormat": "95th Percentile",
+              "refId": "A"
+            },
+            {
+              "expr": "histogram_quantile(0.50, api_latency_seconds_bucket{endpoint=\"generate\"})",
+              "legendFormat": "50th Percentile (Median)",
+              "refId": "B"
+            }
+          ],
+          "yaxes": [
+            {
+              "format": "s",
+              "label": "Latency (seconds)"
+            }
+          ],
+          "xaxis": {
+            "mode": "time"
+          }
+        },
+        {
+          "id": 2,
+          "title": "API Throughput (Requests/Second)",
+          "type": "graph",
+          "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0},
+          "targets": [
+            {
+              "expr": "rate(api_requests_total{endpoint=\"generate\"}[5m])",
+              "legendFormat": "Requests/sec",
+              "refId": "A"
+            }
+          ],
+          "yaxes": [
+            {
+              "format": "reqps",
+              "label": "Throughput"
+            }
+          ],
+          "xaxis": {
+            "mode": "time"
+          }
+        },
+        {
+          "id": 3,
+          "title": "Total API Requests",
+          "type": "graph",
+          "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8},
+          "targets": [
+            {
+              "expr": "api_requests_total{endpoint=\"generate\"}",
+              "legendFormat": "Total Requests",
+              "refId": "A"
+            }
+          ],
+          "yaxes": [
+            {
+              "format": "short"
+            }
+          ]
+        },
+        {
+          "id": 4,
+          "title": "HTTP Request Rate by Status",
+          "type": "graph",
+          "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8},
+          "targets": [
+            {
+              "expr": "rate(http_requests_total[5m])",
+              "legendFormat": "{{method}} {{endpoint}} {{status}}",
+              "refId": "A"
+            }
+          ],
+          "yaxes": [
+            {
+              "format": "reqps"
+            }
+          ]
+        },
+        {
+          "id": 5,
+          "title": "Error Rate",
+          "type": "graph",
+          "gridPos": {"h": 8, "w": 12, "x": 0, "y": 16},
+          "targets": [
+            {
+              "expr": "rate(http_requests_total{status=~\"5..\"}[5m])",
+              "legendFormat": "5xx Errors",
+              "refId": "A"
+            },
+            {
+              "expr": "rate(http_requests_total{status=~\"4..\"}[5m])",
+              "legendFormat": "4xx Errors",
+              "refId": "B"
+            }
+          ],
+          "yaxes": [
+            {
+              "format": "reqps"
+            }
+          ]
+        },
+        {
+          "id": 6,
+          "title": "HTTP Request Latency Distribution",
+          "type": "graph",
+          "gridPos": {"h": 8, "w": 12, "x": 12, "y": 16},
+          "targets": [
+            {
+              "expr": "histogram_quantile(0.99, http_request_duration_seconds_bucket{endpoint=\"generate_ad\"})",
+              "legendFormat": "99th Percentile",
+              "refId": "A"
+            },
+            {
+              "expr": "histogram_quantile(0.95, http_request_duration_seconds_bucket{endpoint=\"generate_ad\"})",
+              "legendFormat": "95th Percentile",
+              "refId": "B"
+            },
+            {
+              "expr": "histogram_quantile(0.50, http_request_duration_seconds_bucket{endpoint=\"generate_ad\"})",
+              "legendFormat": "50th Percentile",
+              "refId": "C"
+            }
+          ],
+          "yaxes": [
+            {
+              "format": "s"
+            }
+          ]
+        },
+        {
+          "id": 7,
+          "title": "Service Uptime",
+          "type": "stat",
+          "gridPos": {"h": 4, "w": 6, "x": 0, "y": 24},
+          "targets": [
+            {
+              "expr": "up{job=\"inference-api\"}",
+              "refId": "A"
+            }
+          ],
+          "options": {
+            "graphMode": "none",
+            "colorMode": "value"
+          }
+        },
+        {
+          "id": 8,
+          "title": "Current Throughput",
+          "type": "stat",
+          "gridPos": {"h": 4, "w": 6, "x": 6, "y": 24},
+          "targets": [
+            {
+              "expr": "rate(api_requests_total{endpoint=\"generate\"}[1m])",
+              "refId": "A"
+            }
+          ],
+          "options": {
+            "graphMode": "area",
+            "colorMode": "value"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "unit": "reqps"
+            }
+          }
+        },
+        {
+          "id": 9,
+          "title": "Current Latency (95th)",
+          "type": "stat",
+          "gridPos": {"h": 4, "w": 6, "x": 12, "y": 24},
+          "targets": [
+            {
+              "expr": "histogram_quantile(0.95, api_latency_seconds_bucket{endpoint=\"generate\"})",
+              "refId": "A"
+            }
+          ],
+          "options": {
+            "graphMode": "area",
+            "colorMode": "value"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "unit": "s"
+            }
+          }
+        },
+        {
+          "id": 10,
+          "title": "Error Rate",
+          "type": "stat",
+          "gridPos": {"h": 4, "w": 6, "x": 18, "y": 24},
+          "targets": [
+            {
+              "expr": "rate(http_requests_total{status=~\"5..\"}[5m])",
+              "refId": "A"
+            }
+          ],
+          "options": {
+            "graphMode": "area",
+            "colorMode": "value"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "unit": "reqps"
+            }
+          }
+        }
+      ],
+      "time": {
+        "from": "now-1h",
+        "to": "now"
+      },
+      "refresh": "10s",
+      "schemaVersion": 27,
+      "version": 1
+    }
+  }

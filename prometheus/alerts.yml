@@ -1,0 +1,63 @@
+groups:
+  - name: inference_api_alerts
+    interval: 30s
+    rules:
+      - alert: HighAPILatency
+        expr: histogram_quantile(0.95, api_latency_seconds_bucket{endpoint="generate"}) > 2
+        for: 5m
+        labels:
+          severity: warning
+          service: inference-api
+        annotations:
+          summary: "High API latency detected"
+          description: "95th percentile API latency is {{ $value }}s (threshold: 2s) for endpoint {{ $labels.endpoint }}"
+
+      - alert: VeryHighAPILatency
+        expr: histogram_quantile(0.95, api_latency_seconds_bucket{endpoint="generate"}) > 5
+        for: 2m
+        labels:
+          severity: critical
+          service: inference-api
+        annotations:
+          summary: "Very high API latency detected"
+          description: "95th percentile API latency is {{ $value }}s (threshold: 5s) for endpoint {{ $labels.endpoint }}"
+
+      - alert: LowThroughput
+        expr: rate(api_requests_total{endpoint="generate"}[5m]) < 0.1
+        for: 10m
+        labels:
+          severity: warning
+          service: inference-api
+        annotations:
+          summary: "Low API throughput detected"
+          description: "API throughput is {{ $value }} requests/sec (threshold: 0.1 req/s)"
+
+      - alert: HighErrorRate
+        expr: rate(http_requests_total{status=~"5.."}[5m]) > 0.1
+        for: 5m
+        labels:
+          severity: critical
+          service: inference-api
+        annotations:
+          summary: "High error rate detected"
+          description: "Error rate is {{ $value }} errors/second for {{ $labels.method }} {{ $labels.endpoint }}"
+
+      - alert: ServiceDown
+        expr: up{job="inference-api"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          service: inference-api
+        annotations:
+          summary: "Inference API is down"
+          description: "The inference API service has been down for more than 1 minute"
+
+      - alert: HighRequestLatency
+        expr: histogram_quantile(0.95, http_request_duration_seconds_bucket{endpoint="generate_ad"}) > 3
+        for: 5m
+        labels:
+          severity: warning
+          service: inference-api
+        annotations:
+          summary: "High HTTP request latency"
+          description: "95th percentile HTTP request latency is {{ $value }}s for {{ $labels.method }} {{ $labels.endpoint }}"
