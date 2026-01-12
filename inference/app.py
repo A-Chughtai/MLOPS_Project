@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify
 from prometheus_client import Counter, Histogram, generate_latest, CONTENT_TYPE_LATEST
 import time
-from inference import generate_ad
+from . import inference
 
 app = Flask(__name__)
 
@@ -74,7 +74,7 @@ def generate_ad_endpoint():
             return jsonify({"error": "Missing 'product_name' in request body"}), 400
         
         product_name = data['product_name']
-        generated_text = generate_ad(product_name)
+        generated_text = inference.generate_ad(product_name)  # Changed to use inference.generate_ad()
         
         return jsonify({
             "product_name": product_name,
@@ -82,6 +82,7 @@ def generate_ad_endpoint():
         })
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
 
 @app.route("/metrics")
 def metrics():

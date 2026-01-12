@@ -4,19 +4,20 @@ WORKDIR /app
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
-    build-essential \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy requirements from root directory
-COPY ../requirements.txt .
+# Install PyTorch CPU-only version first (much faster and smaller)
+# This avoids building from source and significantly reduces build time
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
+
+# Copy requirements and install remaining dependencies
+COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the inference service
 COPY inference/ ./inference/
-
-# Copy models directory
-COPY models/ ./models/
 
 # Expose the API port
 EXPOSE 8000
