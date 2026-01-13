@@ -75,6 +75,25 @@ services:
     networks:
       - monitoring
 
+  airflow:
+    image: apache/airflow:2.7.1-python3.10
+    environment:
+      - AIRFLOW__CORE__EXECUTOR=SequentialExecutor
+      - AIRFLOW__CORE__LOAD_EXAMPLES=False
+      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=sqlite:////opt/airflow/airflow.db
+      - AIRFLOW__WEBSERVER__RBAC=True
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./data:/opt/airflow/data
+      - ./train:/opt/airflow/train
+      - ./models:/opt/airflow/models
+      - ./mlflow.db:/opt/airflow/mlflow.db
+    command: standalone
+    ports:
+      - "8080:8080"
+    networks:
+      - monitoring
+
 networks:
   monitoring:
     driver: bridge
