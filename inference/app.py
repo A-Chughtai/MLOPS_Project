@@ -29,6 +29,7 @@ REQUEST_THROUGHPUT = Counter(
     'Total number of API requests (throughput)',
     ['endpoint']
 )
+REQUEST_THROUGHPUT.labels(endpoint='generate') 
 
 @app.before_request
 def before_request():
@@ -52,7 +53,7 @@ def after_request(response):
     ).observe(latency)
     
     # Record API-specific metrics for /generate endpoint
-    if request.endpoint == 'generate_ad':
+    if request.endpoint == 'generate_ad_endpoint': 
         API_LATENCY.labels(endpoint='generate').observe(latency)
         REQUEST_THROUGHPUT.labels(endpoint='generate').inc()
     

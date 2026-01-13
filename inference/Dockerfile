@@ -23,4 +23,4 @@ COPY inference/ ./inference/
 EXPOSE 8000
 
 # Run the Flask application with Gunicorn
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "--workers", "2", "--timeout", "120", "inference.app:app"]
+CMD ["gunicorn", "--bind", "0.0.0.0:8000", "--workers", "1", "--timeout", "120", "inference.app:app"]
